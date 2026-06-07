@@ -1,3 +1,21 @@
+$root = "c:\laragon\www\ciaoops-landingpage"
+$utf8 = New-Object System.Text.UTF8Encoding $false
+
+function Get-PageTitle($content, $fallback) {
+    if ($content -match '<h1[^>]*>([^<]+)</h1>') { return $Matches[1].Trim() }
+    return $fallback
+}
+
+function Get-FragmentContent($raw) {
+    if ($raw -match '(?s)<main id="mainContent">\s*(.*?)\s*</main>') {
+        return $Matches[1].Trim()
+    }
+    $clean = $raw -replace '(?s)^[\s\S]*?(<section|<div class="event-single)', '$1'
+    return $clean.Trim()
+}
+
+function Get-LayoutHead($title) {
+    $template = @'
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -6,8 +24,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <base href="/ciaoops-landingpage/">
 
-    <title>La Máquina</title>
-    <meta name="description" content="Companhia Teatral Oops!.. â€” Transformando arte em experiências inesquecíveis.">
+    <title>{TITLE}</title>
+    <meta name="description" content="Companhia Teatral Oops!.. — Transformando arte em experiências inesquecíveis.">
     <meta name="robots" content="index, follow">
 
     <link rel="icon" type="image/png" href="assets/images/ciaoops_logomarca.png">
@@ -67,35 +85,14 @@
 </header>
 
 <main id="mainContent">
-<section class="page-hero" style="--page-hero-min-height: 320px;">
-    <div class="page-hero-bg" style="background-image: url('/ciaoops-landingpage/uploads/2026/06/media_6a2469a92eaaa5.54989147.jpg')"></div>
-    <div class="page-hero-overlay" style="background: linear-gradient(135deg, rgba(0, 0, 0, 0.85), rgba(255, 255, 255, 0.65))"></div>
-    <div class="container">
-        <div class="page-hero-content" data-aos="fade-up">
-                        <nav aria-label="Breadcrumb">
-                <ol class="breadcrumb">
-                                                                                            <li class="breadcrumb-item"><a href="/ciaoops-landingpage/index.html">Início</a></li>
-                                                                                                                    <li class="breadcrumb-item active" aria-current="page">La Máquina</li>
-                                                            </ol>
-            </nav>
-                        <h1>La Máquina</h1>
-                                </div>
-    </div>
-</section>
 
-<section class="section">
-    <div class="container">
-        <article class="cms-page-content" data-aos="fade-up">
-                        <p class="cms-page-meta">
-                                <span>Contemporâneo</span>
-                                                <span>2023</span>
-                            </p>
-            
-                        <p class="cms-page-lead">A peça conta a história de uma menina que tenta recuperar a harmonia do planeta, depois que o terrível vilão Atomic começa a destruir a natureza em busca de ganância e poder. Assim, passando por diferentes portais, a menina, com a ajuda dos espectadores, precisa ir restaurando a natureza da poluição e destruição gerada pelo uso desenfreado dos recursos naturais para a criação de fábricas e máquinas.</p>
-            
-                            <p>Prepare-se para se aventurar por dimensões desconhecidas e envolver-se numa história repleta de mistérios, cores e experimentações contemporâneas.</p><p><br></p><p>Prepare-se para se aventurar por dimensões desconhecidas e envolver-se numa história repleta de mistérios, cores e diversão. “La Máquina”, o novo espetáculo da Cia. Teatral Oops!.. é uma experiência imersiva que une a arte e a tecnologia, através da utilização de projeções de vídeo, música eletrónica, criando um cenário dinâmico e mutável, transportando o público para os diversos mundos que serão explorados nessa aventura. A interação direta convida todos os presentes a sentirem-se parte integrante dessa jornada, que destaca a importância da preservação ambiental e do poder da imaginação.</p><p><br></p><p class="ql-align-justify">A peça conta a história de uma menina que tenta recuperar a harmonia do planeta, depois que o terrível vilão Atomic começa a destruir a natureza em busca de ganância e poder. Assim, passando por diferentes portais, a menina, com a ajuda dos espectadores, precisa ir restaurando a natureza da poluição e destruição gerada pelo uso desenfreado dos recursos naturais para a criação de fábricas e máquinas.</p>                    </article>
-    </div>
-</section>
+'@
+    return $template.Replace('{TITLE}', $title)
+}
+
+function Get-LayoutFoot {
+@'
+
 </main>
 
 <footer class="site-footer" id="rodape">
@@ -107,7 +104,7 @@
                         <a href="index.html" class="footer-logo">
                             <img src="assets/images/ciaoops_logomarca.png" alt="Logo CIAO OPS" class="footer-logo-img" width="180" height="55">
                         </a>
-                        <p class="footer-desc">Oops!.. 20 anos Ã© apenas um recorte da nossa histÃ³ria.</p>
+                        <p class="footer-desc">Oops!.. 20 anos é apenas um recorte da nossa história.</p>
                         <div class="footer-social">
                             <a href="https://www.instagram.com/ciaoops" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
                             <a href="https://www.facebook.com/ciaoops" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
@@ -116,7 +113,7 @@
                     </div>
                 </div>
                 <div class="col-lg-2 col-md-6">
-                    <h4 class="footer-title">Links RÃ¡pidos</h4>
+                    <h4 class="footer-title">Links Rápidos</h4>
                     <ul class="footer-links">
                         <li><a href="index.html#inicio">Início</a></li>
                         <li><a href="sobre.html">Sobre</a></li>
@@ -130,10 +127,10 @@
                 <div class="col-lg-3 col-md-6">
                     <h4 class="footer-title">Espetáculos</h4>
                     <ul class="footer-links">
-                        <li><a href="espetaculo/la-maquina/">La MÃ¡quina</a></li>
-                        <li><a href="espetaculo/sonho-de-uma-noite-de-verao/">Sonho de Uma Noite de VerÃ£o</a></li>
+                        <li><a href="espetaculo/la-maquina/">La Máquina</a></li>
+                        <li><a href="espetaculo/sonho-de-uma-noite-de-verao/">Sonho de Uma Noite de Verão</a></li>
                         <li><a href="espetaculo/adan-experience/">Adan Experience</a></li>
-                        <li><a href="espetaculo/o-doente-imaginario/">O Doente ImaginÃ¡rio</a></li>
+                        <li><a href="espetaculo/o-doente-imaginario/">O Doente Imaginário</a></li>
                         <li><a href="espetaculo/william-wilson/">William Wilson</a></li>
                         <li><a href="espetaculo/encantos/">Encantos</a></li>
                     </ul>
@@ -141,7 +138,7 @@
                 <div class="col-lg-3 col-md-6">
                     <h4 class="footer-title">Contato</h4>
                     <ul class="footer-contact">
-                        <li><i class="fa-solid fa-location-dot"></i><span>GoiÃ¢nia - GoiÃ¡s, Brasil</span></li>
+                        <li><i class="fa-solid fa-location-dot"></i><span>Goiânia - Goiás, Brasil</span></li>
                         <li><i class="fa-solid fa-envelope"></i><a href="mailto:contato@ciaoops.com.br">contato@ciaoops.com.br</a></li>
                     </ul>
                 </div>
@@ -151,8 +148,8 @@
     <div class="footer-bottom">
         <div class="container">
             <div class="footer-bottom-inner">
-                <p>Â© 2026 Companhia Teatral Oops!... Todos os direitos reservados.</p>
-                <p class="footer-credit">Desenvolvido por Studiogyn soluÃ§Ãµes para web</p>
+                <p>© 2026 Companhia Teatral Oops!... Todos os direitos reservados.</p>
+                <p class="footer-credit">Desenvolvido por Studiogyn soluções para web</p>
             </div>
         </div>
     </div>
@@ -189,7 +186,7 @@
 <div id="lightbox" class="lightbox" aria-hidden="true">
     <button class="lightbox-close" aria-label="Fechar">&times;</button>
     <button class="lightbox-prev" aria-label="Anterior"><i class="fa-solid fa-chevron-left"></i></button>
-    <button class="lightbox-next" aria-label="PrÃ³ximo"><i class="fa-solid fa-chevron-right"></i></button>
+    <button class="lightbox-next" aria-label="Próximo"><i class="fa-solid fa-chevron-right"></i></button>
     <div class="lightbox-content">
         <img src="" alt="" id="lightboxImage">
         <p id="lightboxCaption"></p>
@@ -210,3 +207,25 @@
 <script src="assets/js/main.js?v=1780866628" defer></script>
 </body>
 </html>
+'@
+}
+
+$files = Get-ChildItem -Path $root -Recurse -Filter "*.html" | Where-Object {
+    $_.FullName -notmatch '\\scripts\\' -and $_.FullName -ne (Join-Path $root 'index.html')
+}
+
+foreach ($file in $files) {
+    $raw = [System.IO.File]::ReadAllText($file.FullName, [System.Text.Encoding]::UTF8)
+    $content = Get-FragmentContent $raw
+    $content = $content -replace 'http://localhost/ciaoops-landingpage/', '/ciaoops-landingpage/'
+
+    $fallback = [System.IO.Path]::GetFileNameWithoutExtension($file.Name)
+    if ($fallback -eq 'index') { $fallback = Split-Path $file.DirectoryName -Leaf }
+    $title = Get-PageTitle $content $fallback
+
+    $wrapped = (Get-LayoutHead $title) + $content + (Get-LayoutFoot)
+    [System.IO.File]::WriteAllText($file.FullName, $wrapped, $utf8)
+    Write-Output "Wrapped: $($file.Name)"
+}
+
+Write-Output "Done."
