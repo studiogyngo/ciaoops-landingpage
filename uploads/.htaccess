@@ -1,0 +1,8 @@
+# Permitir apenas arquivos de mídia
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule . - [F,L]
+</IfModule>
+
+Options -Indexes
